@@ -7,15 +7,31 @@ val RES_LAYOUT_PATH = "app/src/main/res/layout"
 
 fun main(args: Array<String>) {
 
-    File(ROOT_PROJECT_PATH, RES_DRAWABLE_PATH)
-            .listFiles().map { it.nameWithoutExtension }.filter {
-        name ->
+    File(ROOT_PROJECT_PATH, RES_LAYOUT_PATH).listFiles().map{
+        lf ->
+        val text = lf.readText()
+        File(ROOT_PROJECT_PATH, RES_DRAWABLE_PATH).listFiles().map {
+            df->
+            if(text.contains(df.nameWithoutExtension)) null else df
+        }
+    }.flatten().filterNotNull().sortedBy {
+        it.nameWithoutExtension
+    }.distinct().map {
+        println(it.nameWithoutExtension)
+    }
+
+
+
+
+    /*File(ROOT_PROJECT_PATH, RES_DRAWABLE_PATH)
+            .listFiles().filter {
+        drawableFile ->
         File(ROOT_PROJECT_PATH, RES_LAYOUT_PATH).listFiles().filter {
             file ->
-            file.readText().contains(name)
+            file.readText().contains(drawableFile.nameWithoutExtension)
         }.isEmpty()
     }.map {
-        println(it)
-    }
+        println(it.nameWithoutExtension)
+    }*/
 
 }
