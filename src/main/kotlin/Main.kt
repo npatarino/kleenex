@@ -14,15 +14,12 @@ fun main(args: Array<String>) {
     val startTime = Date().time
     searchNonUsedDrawables(File(ROOT_PROJECT_PATH, APP_PATH), File(ROOT_PROJECT_PATH, RES_DRAWABLE_PATH)).map {
         showToConsole(it)
-        //deleteFiles(it)
+        //it.delete()
     }
     val endTime = Date().time
     println((endTime - startTime) / 1000)
 }
 
-private fun deleteFiles(file: File): Unit {
-    file.delete()
-}
 
 private fun searchNonUsedDrawables(filesRoot: File, drawablesRoot: File): List<File> =
         filesRoot.walkTopDown()
