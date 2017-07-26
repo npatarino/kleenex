@@ -1,9 +1,10 @@
 import java.io.File
 import java.util.*
 
-val ROOT_PROJECT_PATH = "C://idealista-android-copia/"
+val ROOT_PROJECT_PATH = "/home/vfrancisco/develop/idealista-android"
 
-val RES_DRAWABLE_PATH = "app/src/main/java"
+val RES_DRAWABLE_PATH = "app/src/main/res/drawable"
+val SRC_PATH = "app/src/main/java"
 val APP_PATH = "app/src/main"
 
 val MANIFEST_PATH = "AndroidManifest.xml"
@@ -12,7 +13,7 @@ val EXTENSION_JAVA = "java"
 
 fun main(args: Array<String>) {
     val startTime = Date().time
-    searchNonUsedDrawables(File(ROOT_PROJECT_PATH, APP_PATH), File(ROOT_PROJECT_PATH, RES_DRAWABLE_PATH)).map {
+    searchNonUsedDrawables(File(ROOT_PROJECT_PATH, APP_PATH), File(ROOT_PROJECT_PATH, SRC_PATH)).map {
         showToConsole(it)
         //it.delete()
     }
@@ -23,7 +24,7 @@ fun main(args: Array<String>) {
 
 private fun searchNonUsedDrawables(filesRoot: File, drawablesRoot: File): List<File> =
         filesRoot.walkTopDown()
-                .filter { isFile(it) }
+                .filter { it.isFile }
                 .asIterable()
                 .map {
                     getNonUsedDrawablesWithNull(it, drawablesRoot)
@@ -43,7 +44,7 @@ private fun getNonUsedDrawablesWithNull(lf: File, drawablesRoot: File): List<Fil
     val text = lf.readText()
     return drawablesRoot.listFiles().map {
         df ->
-        if (isJavaFile(df) && containsFileInManifest(df)) {
+        if (df.isJava() && containsFileInManifest(df)) {
             null
         } else if (containsFilename(text, df)) {
             null
@@ -65,8 +66,6 @@ private fun containsFileInManifest(df: File): Boolean {
 
 }
 
-private fun isFile(it: File) = it.isFile
-
 private fun containsFilename(text: String, df: File) = text.contains(df.nameWithoutExtension)
 
-private fun isJavaFile(file: File): Boolean = file.extension == EXTENSION_JAVA
+private fun File.isJava() : Boolean = extension == EXTENSION_JAVA
