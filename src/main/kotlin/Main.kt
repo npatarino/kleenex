@@ -15,7 +15,6 @@ fun main(args: Array<String>) {
     println((endTime - startTime) / 1000)
 }
 
-
 private fun searchNonUsedDrawables(filesRoot: File, drawablesRoot: File) =
         filesRoot.walkTopDown()
                 .filter { isFile(it) }
@@ -33,15 +32,6 @@ private fun showToConsole(it: File) {
 }
 
 private fun byName(it: File) = it.nameWithoutExtension
-
-private val getNudwn: (File, File) -> List<File?> = {
-    lf, drawablesRoot ->
-    val text = lf.readText()
-    drawablesRoot.listFiles().map {
-        df ->
-        if (containsFilename(text, df)) null else df
-    }
-}
 
 private fun getNonUsedDrawablesWithNull(lf: File, drawablesRoot: File): List<File?> {
     val text = lf.readText()
