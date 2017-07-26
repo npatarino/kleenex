@@ -29,7 +29,7 @@ private fun searchNonUsedResourcesFromFolder(folder: File, resourcesFolder: File
                 .filter { isFile(it) }
                 .asIterable()
                 .map {
-                    getNonUsedDrawablesWithNull(it, resourcesFolder)
+                    getNonUsedResourcesFromFolderInFile(resourcesFolder, it)
                 }.flatten()
                 .filterNotNull()
                 .sortedBy {
@@ -40,18 +40,18 @@ private fun showToConsole(it: File) = println(it.nameWithoutExtension)
 
 private fun byName(it: File) : String = it.nameWithoutExtension
 
-private fun getNonUsedDrawablesWithNull(lf: File, drawablesRoot: File): List<File?> {
-    val text = lf.readText()
-    return drawablesRoot.listFiles().map {
-        df ->
-        if (containsFilename(text, df)) null else df
+private fun getNonUsedResourcesFromFolderInFile(resourcesFolder: File, file: File): List<File?> {
+    val fileContent = file.readText()
+    return resourcesFolder.listFiles().map {
+        file ->
+        if (fileContent.containsFilenameOf(file)) null else file
     }
 }
 
 private fun isFile(it: File) : Boolean = it.isFile
 
-private fun containsFilename(text: String, df: File) : Boolean =
-    text.contains(Regex("^${df.nameWithoutExtension}$"))
+private fun String.containsFilenameOf(file: File) : Boolean =
+    this.contains(Regex("^${file.nameWithoutExtension}$"))
 
 private fun fileFromRelativePath(relativePath : String) : File =
         File(ROOT_PROJECT_PATH, relativePath)
