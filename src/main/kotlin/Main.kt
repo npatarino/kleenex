@@ -1,7 +1,7 @@
 import java.io.File
 import java.util.*
 
-val ROOT_PROJECT_PATH = "/home/argento/projects/idealista/"
+val ROOT_PROJECT_PATH = "C://copy-idealista-android/"
 
 val RES_DRAWABLE_PATH = "app/src/main/res/drawable"
 val APP_PATH = "app/src/main"
