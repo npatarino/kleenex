@@ -2,8 +2,9 @@ import java.io.File
 import java.util.*
 
 val ROOT_PROJECT_PATH = "/home/josedlpozo/workspace/idealista-android"
+val APP_PATH = "app/src/main/"
 
-val RES_DRAWABLE_PATH = "app/src/main/res/drawable"
+val RES_DRAWABLE_PATH = APP_PATH.plus("res/drawable")
 val RES_LDPI_DRAWABLE_PATH = RES_DRAWABLE_PATH.plus("-ldpi")
 val RES_MDPI_DRAWABLE_PATH = RES_DRAWABLE_PATH.plus("-mdpi")
 val RES_HDPI_DRAWABLE_PATH = RES_DRAWABLE_PATH.plus("-hdpi")
@@ -12,17 +13,19 @@ val RES_XXHDPI_DRAWABLE_PATH = RES_DRAWABLE_PATH.plus("-xxhdpi")
 val RES_XXXHDPI_DRAWABLE_PATH = RES_DRAWABLE_PATH.plus("-xxxhdpi")
 val RES_V21_DRAWABLE_PATH = RES_DRAWABLE_PATH.plus("-v21")
 
-val APP_PATH = "app/src/main"
+val JAVA_PATH = APP_PATH.plus("java")
+
+val MANIFEST_PATH = "AndroidManifest.xml"
+
+val EXTENSION_JAVA = "java"
 
 fun main(args: Array<String>) {
     val startTime = Date().time
 
-
-    val folders = listOf(fileFromRelativePath(RES_DRAWABLE_PATH), fileFromRelativePath(RES_LDPI_DRAWABLE_PATH), fileFromRelativePath(RES_MDPI_DRAWABLE_PATH)
-            , fileFromRelativePath(RES_HDPI_DRAWABLE_PATH), fileFromRelativePath(RES_XHDPI_DRAWABLE_PATH), fileFromRelativePath(RES_XXHDPI_DRAWABLE_PATH)
-            , fileFromRelativePath(RES_XXXHDPI_DRAWABLE_PATH), fileFromRelativePath(RES_V21_DRAWABLE_PATH))
+    val folders = listOf(fileFromRelativePath(JAVA_PATH))
     val listNonUsedFolders = searchNonUsedResourcesFromFolders(folders).map {
         showToConsole(it)
+        //it.delete()
     }
 
     println("Size: ${listNonUsedFolders.size}")
@@ -35,7 +38,7 @@ private fun searchNonUsedResourcesFromFolders(folders: List<File>) : List<File> 
     folders.map {
         val searchUsedResourcesFromFolder = searchUsedResourcesFromFolder(fileFromRelativePath(APP_PATH), it)
         it.listFiles().subtract(searchUsedResourcesFromFolder)
-    }.flatten()
+    }.flatten().distinct()
 
 private fun searchUsedResourcesFromFolder(folder: File, resourcesFolder: File) : List<File> =
         folder.walkTopDown()
@@ -49,14 +52,23 @@ private fun searchUsedResourcesFromFolder(folder: File, resourcesFolder: File) :
                     byName(it)
                 }.distinct()
 
-private fun showToConsole(it: File) = println(it.nameWithoutExtension)
+private fun showToConsole(it: File) = println(it.absolutePath)
 
 private fun byName(it: File) : String = it.nameWithoutExtension
 
 private fun getUsedResourcesFromFolderInFile(resourcesFolder: File, file: File): List<File?> {
     val fileContent = file.readText()
+    val manifest = fileFromRelativePath("${APP_PATH}/${MANIFEST_PATH}")
+    val manifestContent = manifest.readText()
     return resourcesFolder.listFiles().map {
-        if (fileContent.containsFilenameOf(it)) it else null
+        println(it.absolutePath)
+        if (it.isJava() && (fileContent.containsFilenameOf(it) || manifestContent.containsFilenameOf(it))) {
+            it
+        } else if (fileContent.containsFilenameOf(it)) {
+            it
+        } else {
+            null
+        }
     }
 }
 
@@ -67,3 +79,6 @@ private fun String.containsFilenameOf(file: File) : Boolean =
 
 private fun fileFromRelativePath(relativePath : String) : File =
         File(ROOT_PROJECT_PATH, relativePath)
+
+private fun File.isJava() : Boolean = extension == EXTENSION_JAVA
+
