@@ -22,7 +22,11 @@ val EXTENSION_JAVA = "java"
 fun main(args: Array<String>) {
     val startTime = Date().time
 
-    val folders = listOf(fileFromRelativePath(JAVA_PATH))
+    val folders = listOf(fileFromRelativePath(RES_DRAWABLE_PATH), fileFromRelativePath(RES_LDPI_DRAWABLE_PATH),
+            fileFromRelativePath(RES_MDPI_DRAWABLE_PATH), fileFromRelativePath(RES_HDPI_DRAWABLE_PATH),
+            fileFromRelativePath(RES_XHDPI_DRAWABLE_PATH), fileFromRelativePath(RES_XXHDPI_DRAWABLE_PATH),
+            fileFromRelativePath(RES_XXXHDPI_DRAWABLE_PATH), fileFromRelativePath(RES_V21_DRAWABLE_PATH),
+            fileFromRelativePath(JAVA_PATH))
     val listNonUsedFolders = searchNonUsedResourcesFromFolders(folders).map {
         showToConsole(it)
         //it.delete()
@@ -37,7 +41,7 @@ fun main(args: Array<String>) {
 private fun searchNonUsedResourcesFromFolders(folders: List<File>) : List<File> =
     folders.map {
         val searchUsedResourcesFromFolder = searchUsedResourcesFromFolder(fileFromRelativePath(APP_PATH), it)
-        it.listFiles().subtract(searchUsedResourcesFromFolder)
+        it.walkTopDown().filter { isFile(it) }.asIterable().subtract(searchUsedResourcesFromFolder)
     }.flatten().distinct()
 
 private fun searchUsedResourcesFromFolder(folder: File, resourcesFolder: File) : List<File> =
@@ -60,9 +64,10 @@ private fun getUsedResourcesFromFolderInFile(resourcesFolder: File, file: File):
     val fileContent = file.readText()
     val manifest = fileFromRelativePath("${APP_PATH}/${MANIFEST_PATH}")
     val manifestContent = manifest.readText()
-    return resourcesFolder.listFiles().map {
-        println(it.absolutePath)
-        if (it.isJava() && (fileContent.containsFilenameOf(it) || manifestContent.containsFilenameOf(it))) {
+    return resourcesFolder.walkBottomUp().filter { isFile(it) }.asIterable().map {
+        if (file == it) {
+            null
+        } else if (it.isJava() && fileContent.containsFilenameOf(it)) {
             it
         } else if (fileContent.containsFilenameOf(it)) {
             it
