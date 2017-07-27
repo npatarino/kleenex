@@ -1,7 +1,7 @@
 import java.io.File
 import java.util.*
 
-val ROOT_PROJECT_PATH = "/home/josedlpozo/workspace/idealista-android"
+val ROOT_PROJECT_PATH = "/home/vfrancisco/develop/idealista-android"
 
 val RES_DRAWABLE_PATH = "app/src/main/res/drawable"
 val RES_LDPI_DRAWABLE_PATH = RES_DRAWABLE_PATH.plus("-ldpi")
@@ -54,16 +54,20 @@ private fun showToConsole(it: File) = println(it.nameWithoutExtension)
 private fun byName(it: File) : String = it.nameWithoutExtension
 
 private fun getUsedResourcesFromFolderInFile(resourcesFolder: File, file: File): List<File?> {
-    val fileContent = file.readText()
     return resourcesFolder.listFiles().map {
-        if (fileContent.containsFilenameOf(it)) it else null
+        if (it.contains(file.nameWithoutExtension)) it else null
     }
 }
 
 private fun isFile(it: File) : Boolean = it.isFile
 
-private fun String.containsFilenameOf(file: File) : Boolean =
-    this.contains(file.nameWithoutExtension)
-
 private fun fileFromRelativePath(relativePath : String) : File =
         File(ROOT_PROJECT_PATH, relativePath)
+
+private fun File.contains(text: String) : Boolean {
+    if (!isFile) return false
+
+    val fileContent = readText()
+    val regex = "\\b${text}\\b".toRegex()
+    return fileContent.contains(regex)
+}
