@@ -67,7 +67,7 @@ private fun getUsedResourcesFromFolderInFile(resourcesFolder: File, file: File):
     return resourcesFolder.walkBottomUp().filter { isFile(it) }.asIterable().map {
         if (file == it) {
             null
-        } else if (it.isJava() && fileContent.containsFilenameOf(it)) {
+        } else if (it.isJava() && (fileContent.containsFilenameOf(it) || manifestContent.containsFilenameOf(it))) {
             it
         } else if (fileContent.containsFilenameOf(it)) {
             it
@@ -79,11 +79,11 @@ private fun getUsedResourcesFromFolderInFile(resourcesFolder: File, file: File):
 
 private fun isFile(it: File) : Boolean = it.isFile
 
-private fun String.containsFilenameOf(file: File) : Boolean =
-    this.contains(file.nameWithoutExtension)
-
 private fun fileFromRelativePath(relativePath : String) : File =
         File(ROOT_PROJECT_PATH, relativePath)
 
 private fun File.isJava() : Boolean = extension == EXTENSION_JAVA
 
+private fun String.containsFilenameOf(file: File) : Boolean {
+    return "\\b${file.nameWithoutExtension}\\b".toRegex().containsMatchIn(this)
+}
